@@ -24,6 +24,6 @@ interface RouteMapProps {
   focusRoute?: string
 }
 
-export default function RouteMap({ routes, focusRoute }: RouteMapProps) {
-  return <RouteMapClient routes={routes} focusRoute={focusRoute} />
+export default function RouteMap({ routes }: RouteMapProps) {
+  return <RouteMapClient routes={routes} />
 }
