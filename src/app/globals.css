@@ -1,26 +1,223 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@plugin "@tailwindcss/typography";
+@import "leaflet/dist/leaflet.css";
+@import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #fafafa;
+  --color-foreground: #18181b;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-muted: #71717a;
+  --color-subtle: #a1a1aa;
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-surface: rgba(0, 0, 0, 0.03);
+  --color-pine: #2d6a4f;
+  --color-pine-light: rgba(45, 106, 79, 0.08);
+  --color-pine-mid: rgba(45, 106, 79, 0.15);
+  --color-pine-glow: rgba(45, 106, 79, 0.25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Leaflet 修复 - 确保地图显示 */
+.leaflet-container {
+  z-index: 0;
+  border-radius: 1rem;
+  width: 100% !important;
+  height: 100% !important;
+}
+.leaflet-pane {
+  z-index: 1;
+}
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 2;
+}
+.custom-marker,
+.custom-start-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+}
+
+/* ===== 动效 ===== */
+
+/* 呼吸脉冲 - 更明显 */
+@keyframes pulse-pine {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 12px rgba(45, 106, 79, 0.3); }
+}
+.animate-pulse-pine {
+  animation: pulse-pine 2s ease-in-out infinite;
+}
+
+/* 翠绿流光 */
+@keyframes border-flow {
+  0% { border-color: rgba(45, 106, 79, 0.1); box-shadow: 0 0 0px rgba(45, 106, 79, 0); }
+  50% { border-color: rgba(45, 106, 79, 0.4); box-shadow: 0 0 20px rgba(45, 106, 79, 0.08); }
+  100% { border-color: rgba(45, 106, 79, 0.1); box-shadow: 0 0 0px rgba(45, 106, 79, 0); }
+}
+.animate-border-flow {
+  animation: border-flow 3s ease-in-out infinite;
+}
+
+/* 渐入上滑 */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out both;
+}
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.2s; }
+.anim-delay-3 { animation-delay: 0.3s; }
+.anim-delay-4 { animation-delay: 0.4s; }
+
+/* 浮动光晕 */
+@keyframes float-glow {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
+  50% { transform: translateY(-15px) scale(1.1); opacity: 0.35; }
+}
+.animate-float-glow {
+  animation: float-glow 4s ease-in-out infinite;
+}
+
+/* 卡片hover */
+.card-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-glow:hover {
+  border-color: var(--color-pine-mid);
+  box-shadow: 0 8px 32px rgba(45, 106, 79, 0.1), 0 0 0 1px rgba(45, 106, 79, 0.1);
+  transform: translateY(-3px);
+}
+
+/* 翠绿闪烁下划线 */
+@keyframes underline-glow {
+  0% { width: 0; opacity: 0; }
+  50% { width: 100%; opacity: 1; }
+  100% { width: 0; opacity: 0; }
+}
+
+/* Prose */
+.prose {
+  --tw-prose-body: #3f3f46;
+  --tw-prose-headings: #18181b;
+  --tw-prose-links: #2d6a4f;
+  --tw-prose-bold: #18181b;
+  --tw-prose-counters: #a1a1aa;
+  --tw-prose-bullets: #d4d4d8;
+  --tw-prose-hr: var(--color-border);
+  --tw-prose-quotes: #3f3f46;
+  --tw-prose-quote-borders: #d4d4d8;
+  --tw-prose-code: #2d6a4f;
+  --tw-prose-pre-bg: #f4f4f5;
+}
+
+/* ===== 暗色模式 ===== */
+.dark {
+  --color-background: #0f0f12;
+  --color-foreground: #ffffff;
+  --color-muted: #e4e4e7;
+  --color-subtle: #d4d4d8;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-surface: rgba(255, 255, 255, 0.04);
+}
+
+/* 强制覆盖所有文字颜色 */
+.dark, .dark * {
+  color-scheme: dark;
+}
+.dark .text-foreground,
+.dark h1, .dark h2, .dark h3, .dark h4,
+.dark .font-semibold, .dark .font-medium, .dark .font-bold {
+  color: #ffffff !important;
+}
+.dark .text-muted,
+.dark p, .dark span:not(.text-transparent), .dark .text-sm, .dark .text-xs, .dark .text-base,
+.dark .text-lg, .dark .text-xl, .dark .text-2xl, .dark .text-3xl {
+  color: #e4e4e7 !important;
+}
+.dark .text-subtle,
+.dark .text-border {
+  color: #a1a1aa !important;
+}
+.dark .text-stone-800,
+.dark .text-stone-700,
+.dark .text-stone-600,
+.dark .text-stone-500,
+.dark .text-stone-400 {
+  color: #e4e4e7 !important;
+}
+.dark .text-pine {
+  color: #2d6a4f !important;
+}
+.dark .text-pine\/70,
+.dark .text-pine\/60 {
+  color: #2d6a4f !important;
+}
+.dark .text-tech-400 {
+  color: #4ade80 !important;
+}
+.dark .text-tech-400\/60 {
+  color: #4ade80 !important;
+}
+.dark a:not(.no-dark) {
+  color: #4ade80 !important;
+}
+
+/* 暗色卡片背景 */
+.dark .bg-white,
+.dark .bg-stone-50,
+.dark .bg-stone-100 {
+  background-color: #18181b !important;
+}
+.dark .glass-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .glass-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .card-glow:hover {
+  border-color: rgba(74, 222, 128, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(74, 222, 128, 0.06) !important;
+}
+
+/* 暗色滚动条 */
+.dark ::-webkit-scrollbar-track { background: #1a1a1e !important; }
+.dark ::-webkit-scrollbar-thumb { background: #3f3f46 !important; }
+
+/* 暗色地图 */
+.dark .leaflet-container { background: #1a1a1e !important; }
+.dark .leaflet-popup-content-wrapper { background: #1a1a1e !important; color: #e4e4e7 !important; }
+.dark .leaflet-popup-tip { background: #1a1a1e !important; }
+
+/* 暗色 prose */
+.dark .prose,
+.dark .prose * {
+  --tw-prose-body: #d4d4d8 !important;
+  --tw-prose-headings: #ffffff !important;
+  --tw-prose-links: #4ade80 !important;
+  --tw-prose-bold: #ffffff !important;
+  --tw-prose-counters: #a1a1aa !important;
+  --tw-prose-bullets: #52525b !important;
+  --tw-prose-quotes: #d4d4d8 !important;
+  --tw-prose-code: #4ade80 !important;
+  --tw-prose-pre-bg: rgba(255, 255, 255, 0.03) !important;
 }
