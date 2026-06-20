@@ -2,7 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { getPostBySlug, getAllPosts } from "@/lib/posts"
+import { getPostBySlugAsync, getAllPosts } from "@/lib/posts"
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -12,8 +12,9 @@ export async function generateStaticParams() {
 
 export default async function PostDetailPage({ params }: Props) {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlugAsync(slug)
   if (!post) notFound()
+
   const all = getAllPosts()
   const ci = all.findIndex(p => p.slug === slug)
   const prev = ci < all.length - 1 ? all[ci + 1] : null

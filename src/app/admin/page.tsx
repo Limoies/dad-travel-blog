@@ -120,13 +120,17 @@ export default function AdminPage() {
                       <p className="text-sm font-medium text-foreground truncate">{route.title}</p>
                       <p className="text-xs text-muted">{route.postCount || 0} 篇日志 · {route.date}</p>
                     </div>
-                    <span className="text-xs text-subtle ml-2 shrink-0">{route.slug}</span>
+                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                      <a href={`/admin/new?type=route&edit=${route.slug}`}
+                        className="text-xs text-pine hover:text-pine/80 transition-colors">编辑</a>
+                      <span className="text-xs text-subtle">{route.slug}</span>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
             <p className="mt-3 text-xs text-subtle text-center">
-              编辑功能开发中，可在 <code className="bg-surface px-1 rounded text-pine">content/routes/</code> 编辑 Markdown
+              在 <code className="bg-surface px-1 rounded text-pine">content/routes/</code> 或后台编辑
             </p>
           </div>
 
@@ -143,7 +147,11 @@ export default function AdminPage() {
                       <p className="text-sm font-medium text-foreground truncate">{post.title}</p>
                       <p className="text-xs text-muted">{post.location} · {post.date}</p>
                     </div>
-                    <span className="text-xs text-subtle ml-2 shrink-0">{post.slug}</span>
+                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                      <a href={`/admin/new?type=post&edit=${post.slug}`}
+                        className="text-xs text-pine hover:text-pine/80 transition-colors">编辑</a>
+                      <span className="text-xs text-subtle">{post.slug}</span>
+                    </div>
                   </div>
                 ))}
               </div>

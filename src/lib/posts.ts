@@ -7,10 +7,68 @@ const ROUTES_DIR = path.join(process.cwd(), 'content', 'routes')
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts')
 const IMAGES_DIR = path.join(process.cwd(), 'public', 'images')
 
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN
+const GITHUB_REPO = process.env.GITHUB_REPO || 'Limoies/dad-travel-blog'
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main'
+
+// 通过 GitHub API 获取文件内容
+async function fetchFromGitHub(filePath: string): Promise<string | null> {
+  if (!GITHUB_TOKEN) return null
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}?ref=${GITHUB_BRANCH}`
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+      next: { revalidate: 30 }, // 缓存30秒
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    if (!data.content) return null
+    return Buffer.from(data.content, 'base64').toString('utf-8')
+  } catch {
+    return null
+  }
+}
+
+// 通过 GitHub API 获取目录下所有文件
+async function listFromGitHub(dir: string): Promise<string[]> {
+  if (!GITHUB_TOKEN) return []
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${dir}?ref=${GITHUB_BRANCH}`
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+      next: { revalidate: 30 },
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data as any[])
+      .filter((item: any) => item.name.endsWith('.md'))
+      .map((item: any) => item.name)
+  } catch {
+    return []
+  }
+}
+
 // ===== 确保目录存在 =====
 export function ensureContentDirs() {
   if (!fs.existsSync(ROUTES_DIR)) fs.mkdirSync(ROUTES_DIR, { recursive: true })
   if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true })
+}
+
+// ===== 读取单个 Markdown 文件 =====
+function readMdFile(filePath: string): { data: any; content: string } | null {
+  try {
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf-8')
+      return matter(raw)
+    }
+  } catch { /* 忽略 */ }
+  return null
 }
 
 // ===== 读取所有路线 =====
@@ -19,8 +77,8 @@ export function getAllRoutes(): Route[] {
   const files = fs.readdirSync(ROUTES_DIR).filter(f => f.endsWith('.md'))
   return files.map(file => {
     const slug = file.replace(/\.md$/, '')
-    const raw = fs.readFileSync(path.join(ROUTES_DIR, file), 'utf-8')
-    const { data } = matter(raw)
+    const parsed = readMdFile(path.join(ROUTES_DIR, file))
+    const data = parsed?.data || {}
     return {
       slug,
       title: data.title || slug,
@@ -42,10 +100,11 @@ export function getRouteBySlug(slug: string): Route | null {
 export function getAllPosts(): Post[] {
   ensureContentDirs()
   const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'))
-  return files.map(file => {
+  const posts = files.map(file => {
     const slug = file.replace(/\.md$/, '')
-    const raw = fs.readFileSync(path.join(POSTS_DIR, file), 'utf-8')
-    const { data, content } = matter(raw)
+    const parsed = readMdFile(path.join(POSTS_DIR, file))
+    if (!parsed) return null
+    const { data, content } = parsed
     return {
       slug,
       title: data.title || slug,
@@ -57,11 +116,38 @@ export function getAllPosts(): Post[] {
       cover: data.cover || '',
       content,
     } as Post
-  }).sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  }).filter(Boolean) as Post[]
+  return posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 }
 
 export function getPostBySlug(slug: string): Post | null {
-  return getAllPosts().find(p => p.slug === slug) || null
+  const posts = getAllPosts()
+  return posts.find(p => p.slug === slug) || null
+}
+
+/** 从文件系统 + GitHub API 获取日志（确保新添加的也能读到） */
+export async function getPostBySlugAsync(slug: string): Promise<Post | null> {
+  // 先尝试本地文件
+  const local = getPostBySlug(slug)
+  if (local) return local
+
+  // 本地没有，从 GitHub API 获取
+  const filePath = `content/posts/${slug}.md`
+  const raw = await fetchFromGitHub(filePath)
+  if (!raw) return null
+
+  const { data, content } = matter(raw)
+  return {
+    slug,
+    title: data.title || slug,
+    date: data.date || '',
+    route: data.route || '',
+    location: data.location || '',
+    coordinates: (data.coordinates as [number, number]) || undefined,
+    tags: (data.tags as string[]) || [],
+    cover: data.cover || '',
+    content,
+  } as Post
 }
 
 export function getPostsByRoute(routeSlug: string): Post[] {
@@ -94,8 +180,6 @@ export function getGlobalStats() {
   const routes = getAllRoutes()
   const posts = getAllPosts()
   const tags = getAllTags()
-
-  // 计算总里程
   let totalKm = 0
   for (const route of routes) {
     for (let i = 1; i < route.coordinates.length; i++) {
@@ -108,8 +192,6 @@ export function getGlobalStats() {
       totalKm += Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
     }
   }
-
-  // 扫描照片数量
   let photoCount = 0
   function countPhotos(dir: string) {
     if (!fs.existsSync(dir)) return
@@ -120,12 +202,5 @@ export function getGlobalStats() {
     }
   }
   countPhotos(IMAGES_DIR)
-
-  return {
-    routeCount: routes.length,
-    postCount: posts.length,
-    tagCount: tags.length,
-    photoCount,
-    totalKm,
-  }
+  return { routeCount: routes.length, postCount: posts.length, tagCount: tags.length, photoCount, totalKm }
 }
