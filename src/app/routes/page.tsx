@@ -9,7 +9,7 @@ export default function RoutesPage() {
       <div className="mb-10">
         <p className="text-xs text-subtle tracking-wider">ROUTES</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">旅行路线</h1>
-        <p className="mt-1 text-sm text-muted">老爸用方向盘走过的每一段路</p>
+        <p className="mt-1 text-sm text-muted">石头用方向盘走过的每一段路</p>
       </div>
 
       {routes.length === 0 ? (

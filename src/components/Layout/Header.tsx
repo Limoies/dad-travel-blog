@@ -26,7 +26,7 @@ export default function Header() {
                 <div className="absolute inset-0 rounded-lg animate-pulse-soft bg-pine/20" />
               </div>
               <span className="text-sm font-medium text-foreground/70 group-hover:text-pine transition-colors duration-300">
-                老爸自驾
+                石头自驾
               </span>
             </Link>
 

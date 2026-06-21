@@ -6,7 +6,7 @@ export default function Footer() {
           用方向盘丈量大地 · 用镜头定格风景
         </p>
         <p className="mt-2 text-xs text-subtle/50">
-          &copy; {new Date().getFullYear()} 老爸自驾日志
+          &copy; {new Date().getFullYear()} 石头自驾日志
         </p>
       </div>
     </footer>

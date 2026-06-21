@@ -61,7 +61,7 @@ export default function GalleryPage() {
       <div className="mb-10">
         <p className="text-xs text-subtle tracking-wider">GALLERY</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">照片墙</h1>
-        <p className="mt-1 text-sm text-muted">老爸镜头里的风景</p>
+        <p className="mt-1 text-sm text-muted">石头镜头里的风景</p>
         {dirImages.length > 0 && (
           <p className="mt-2 text-xs text-pine">📸 {dirImages.length} 张照片</p>
         )}

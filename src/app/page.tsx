@@ -18,11 +18,11 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-6xl px-4 text-center">
           <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-pine/20 bg-pine-light px-4 py-1.5 text-xs text-pine animate-slide-up">
             <span className="inline-block h-2 w-2 rounded-full bg-pine animate-pulse-pine" />
-            自驾游 · 旅行日志
+            🎉 爸爸父亲节快乐 · 自驾游旅行日志
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight lg:text-6xl animate-slide-up anim-delay-1">
-            <span className="text-foreground">老爸的</span>
+            <span className="text-foreground">石头的</span>
             <br />
             <span className="bg-gradient-to-r from-pine to-[#0d9488] bg-clip-text text-transparent">
               自驾日志

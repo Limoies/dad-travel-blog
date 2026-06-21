@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "老爸自驾日志",
+  title: "石头旅游日志",
   description: "用方向盘丈量大地，用镜头定格风景 —— 自驾游旅行日志",
 }
 
