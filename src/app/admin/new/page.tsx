@@ -23,6 +23,8 @@ function EditorForm() {
   const [coordinates, setCoordinates] = useState('')
   const [tags, setTags] = useState('')
   const [content, setContent] = useState('')
+  const [imageList, setImageList] = useState<{ src: string; route: string }[]>([])
+  const [showImages, setShowImages] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('admin_logged_in')
@@ -177,6 +179,29 @@ function EditorForm() {
             <textarea value={content} onChange={e => setContent(e.target.value)}
               placeholder={`## 标题\n\n写你的旅行故事...`} rows={10}
               className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-foreground placeholder:text-subtle outline-none focus:border-pine/40 transition-all resize-y font-mono" />
+            <div className="mt-2">
+              <button onClick={() => {
+                setShowImages(!showImages)
+                if (!showImages && imageList.length === 0) {
+                  fetch('/api/images').then(r => r.json()).then(d => setImageList(d.images || []))
+                }
+              }} className="text-xs text-pine hover:text-pine/80 transition-colors">
+                {showImages ? '收起照片' : '📷 插入照片'}
+              </button>
+              {showImages && imageList.length > 0 && (
+                <div className="mt-2 grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-2 rounded-lg bg-surface">
+                  {imageList.map((img, i) => (
+                    <button key={i} onClick={() => setContent(prev => prev + `\n![${img.route}](${img.src})\n`)}
+                      className="group relative aspect-square overflow-hidden rounded-lg bg-white border border-border hover:border-pine/30 transition-all">
+                      <img src={img.src} alt={img.route} className="h-full w-full object-cover" />
+                      <div className="absolute inset-x-0 bottom-0 bg-black/50 px-1 py-0.5 text-[10px] text-white truncate opacity-0 group-hover:opacity-100 transition-opacity">
+                        {img.src.split('/').pop()}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <button onClick={handleSave} disabled={saving || !title}
