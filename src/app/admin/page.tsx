@@ -96,6 +96,10 @@ export default function AdminPage() {
             className="rounded-lg bg-pine px-4 py-2 text-xs font-medium text-white hover:bg-pine/90 transition-colors">
             ✍️ 写日志
           </button>
+          <button onClick={() => window.location.href = '/admin/upload'}
+            className="rounded-lg border border-pine/30 bg-pine-light px-4 py-2 text-xs font-medium text-pine hover:bg-pine/20 transition-colors">
+            📸 传照片
+          </button>
           <button onClick={handleLogout}
             className="rounded-lg border border-border bg-white px-4 py-2 text-xs text-muted hover:text-foreground transition-colors">
             退出
